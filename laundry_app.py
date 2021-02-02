@@ -92,7 +92,6 @@ df_FS['Pants_Colour'] = label_encoder.fit_transform(df_FS['Pants_Colour'])
 predict_set = df_FS.iloc[[-1]]
 
 X = df_FS.iloc[:-1]
-colnames = X.columns
 
 st.subheader("Label encoded dataset")
 st.write(X.head())
@@ -105,7 +104,7 @@ def get_learning(ml_name):
     if ml_name == "Naive Bayes":
         ml = GaussianNB()
     else:
-        ml = KNeighborsClassifier(n_neighbors=10)
+        ml = KNeighborsClassifier(n_neighbors=9)
     return ml
 
 
