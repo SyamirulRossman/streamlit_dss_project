@@ -105,7 +105,7 @@ def get_learning(ml_name):
     if ml_name == "Naive Bayes":
         ml = GaussianNB()
     else:
-        ml = KNeighborsClassifier()
+        ml = KNeighborsClassifier(n_neighbors=10)
     return ml
 
 
