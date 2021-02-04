@@ -6,15 +6,22 @@ from sklearn import preprocessing
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 from sklearn.model_selection import train_test_split
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.metrics import roc_curve
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import precision_recall_curve
 
 from matplotlib import pyplot as plt
 
 st.title("DSS Project: Laundry decision support system")
+st.write("Course: TIC3251 DECISION SUPPORT SYSTEMS")
+st.write("Trimester: 2, 2020/2021")
+st.write("Student 1: Mohamad Syamirul Arif Bin Rossman Noor (1171101813), 1171101813@student.mmu.edu.my")
+st.write("Student 2: Ahmad Syamil Bin Anuar (1171101748), 1171101748@student.mmu.edu.my")
 
 df = pd.read_csv('LAUNDRY.csv')
 df = df.drop(['No', 'Date', 'Time'], axis=1)
@@ -97,14 +104,16 @@ st.subheader("Label encoded dataset")
 st.write(X.head())
 
 learning_name = st.selectbox(
-    "Select Classifier/Clustering", ("Naive Bayes", "k-NN"))
+    "Select Classifier/Clustering", ("Naive Bayes", "k-NN", "Random Forest"))
 
 
 def get_learning(ml_name):
     if ml_name == "Naive Bayes":
         ml = GaussianNB()
-    else:
+    elif ml_name == "k-NN":
         ml = KNeighborsClassifier(n_neighbors=9)
+    else:
+        ml = RandomForestClassifier(random_state=10)
     return ml
 
 
@@ -131,15 +140,34 @@ prob_ml = ml.predict_proba(X_test)
 prob_ml = prob_ml[:, 1]
 
 fpr_ml, tpr_ml, thresholds_ml = roc_curve(y_test, prob_ml, pos_label="big")
+prec_ml, rec_ml, threshold_ml = precision_recall_curve(
+    y_test, prob_ml, pos_label="big")
 
-st.subheader("ROC Curve")
+st.subheader("Performance Graph")
 
-plt.plot(fpr_ml, tpr_ml, color='red', label=f'{learning_name}')
-plt.plot([0, 1], [0, 1], color='green', linestyle='--')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC) Curve')
-plt.legend()
+chart_name = st.selectbox(
+    "Select Performance Graph", ("ROC Curve", "Precision-Recall Curve"))
+
+
+def get_chart(chart_name):
+    if chart_name == "ROC Curve":
+        plt.plot(fpr_ml, tpr_ml, color='red', label=f'{learning_name}')
+        plt.plot([0, 1], [0, 1], color='green', linestyle='--')
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver Operating Characteristic (ROC) Curve')
+        plt.legend()
+    else:
+        plt.plot(prec_ml, rec_ml, color='blue', label=f'{learning_name}')
+        plt.plot([1, 0], [0.1, 0.1], color='green', linestyle='--')
+        plt.xlabel('Recall')
+        plt.ylabel('Precision')
+        plt.title('Precision-Recall Curve')
+        plt.legend()
+    return plt
+
+
+plt = get_chart(chart_name)
 
 st.pyplot(plt)
 
